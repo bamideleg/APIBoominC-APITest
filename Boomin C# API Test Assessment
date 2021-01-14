@@ -1,0 +1,161 @@
+
+Test environment configuration and the tools: 
+---------------------------------------------------------
+Acceptance Criteria
+
+1. Required Nuget Packages: Specflow for the BDD Feature file. 
+   To make HTTP Requests, RestSharp was used 
+2. For the Test Runner, Nunit was used. 
+
+
+
+BBD scenarios and the related codes.
+-----------------------------------------------------------------------
+
+
+
+Feature: Location - POST, GET, UPDATE, GET and DELETE
+
+Scenario outline: POST - add location
+  Given: I create a new location (<location>)
+  Then: The application should return <statusCode>
+  
+Examples: 
+      | location    | StatusCode | id |
+      | Location001 | 200        | 1  |
+      | Location002 | 200        | 2  |
+      | Location003 | 200        | 3  |
+      | Location004 | 200        | 4  |
+      | Location005 | 200        | 5  |
+	 	  
+	  
+Code: 
+
+POST - Create location
+-------------------------------------------------------------------------
+
+[Given(@"I create a new location(.*),(.*)\)")]
+public void GivenICreateANewLocation
+(string Address, int Id)
+{
+          _
+                     
+location = new location()
+          {
+              location = location,
+              Id = Id
+          };
+
+          var request = new HttpRequestWrapper()
+                          .SetMethod(Method.POST)
+						  .SetResourse("/api/locations/")
+                          .AddJsonContent(_location)
+
+          _restResponse = new RestResponse();
+          _restResponse = request.Execute();
+          _statusCode = _restResponse.StatusCode;
+
+		  ScenarioContext.Current.Add("Loc",_location);
+}
+
+ [Then(@"The application should return")]
+ public void TheApplicationShouldReturn()
+ {
+          Assert.AreEqual(_statusCode, HttpStatusCode.Created);
+ }
+	  
+	  
+Scenario: GET location
+
+  Given: that I navigate the url
+  And: Enter the endpoint url
+  And: click on search location button
+  Then:the location shoould be displayed
+  Then: The application should return <statusCode>
+  
+  
+  Code:
+  ------------------------------------------------------------------------
+  GET URL: The endpoint will be passed together with the url.
+  
+  Data will be displayed in the response section as a payload with status code (200)
+  
+
+ 
+ ------------------------------------------------------------
+	  
+Scenario: UPDATE location
+  Given: that I updated an existing location (<location>)
+  Then: the system should display the location
+  Then: The application should return <statusCode>	
+  
+  
+ Examples: 
+      | NewLocation | StatusCode |
+      | Location004 | 200        | 
+
+	  
+  
+  Code
+  ---------------------------------------------------------------------
+  
+  Scenario: UPDATE an existing location
+  
+[When(@"I updated an existing location (.*),(.*)\)")] 
+public void WhenIUpdatedAnExistingLocation(string NewLocation, id)
+{
+         _country.location = NewLocation;
+		  Id = Id
+		  
+		  );
+          var request = new HttpRequestWrapper()
+		  
+		                 .SetMethod(Method.PUT)
+						 .SetResourse("/api/locations/")
+                         .AddJsonContent(_location);
+                           
+
+          //_restResponse = new RestResponse();
+          var response = request.Execute();
+ }
+
+
+       _restResponse = new RestResponse();
+       _restResponse = request.Execute();
+
+       _statusCode = _restResponse.StatusCode;
+	   _location = JsonConvert.DeserializeObject<List<location>>(_restResponse.Content);
+
+ }
+
+ [Then(@"the updated location should be included in the list")]
+ public void ThenTheUpdatedLocationShouldBeIncludedInTheList()
+ {
+          Assert.That(() => _location.Contains(_location))
+ }
+
+
+---------------------------------------------------------------------
+  
+Scenario: DELETE location
+  Given: I create a location (<location, id>)
+  When:  I delete a location
+  And: I make a request to view the location (<id>)
+  Then: The application should not return data	 
+
+Examples:
+       | location    | id |
+       | Location004 |  4 | 
+       | Location005 |  5 |	   
+
+
+ Code
+----------------------------------------------------------------------
+
+HttpDelete]
+[Given(@"I create a location and delete the location")]
+public void GivenICreateALocationAndSeleteTheLocation(int id)
+{
+    _Location.DeleteLocation(id);
+    return Ok();
+}
